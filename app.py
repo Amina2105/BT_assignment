@@ -37,3 +37,82 @@ class Block:
             merkle_tree = new_merkle_tree
         return merkle_tree[0]
 
+class Blockchain:
+    def __init__(self):
+        self.chain = [self.create_genesis_block()]
+        self.difficulty = 2
+
+    def create_genesis_block(self):
+        return Block(0, "0", int(time.time()), [])
+
+    def get_latest_block(self):
+        return self.chain[-1]
+
+    def add_block(self, new_block):
+        new_block.previous_hash = self.get_latest_block().hash
+        new_block.mine_block(self.difficulty)
+        self.chain.append(new_block)
+
+    def is_chain_valid(self):
+        for i in range(1, len(self.chain)):
+            current_block = self.chain[i]
+            previous_block = self.chain[i - 1]
+
+            if current_block.hash != current_block.calculate_hash():
+                return False
+            if current_block.previous_hash != previous_block.hash:
+                return False
+        return True
+
+def main():
+    blockchain = Blockchain()
+
+    while True:
+        print("\nBlockchain Console Interface")
+        print("1. View Blockchain")
+        print("2. Add Transaction")
+        print("3. Mine Block")
+        print("4. Verify Blockchain")
+        print("5. Exit")
+
+        choice = input("Enter your choice: ")
+
+        if choice == "1":
+            print("\nBlockchain:")
+            for block in blockchain.chain:
+                print(f"Block {block.index}")
+                print(f"Hash: {block.hash}")
+                print(f"Timestamp: {block.timestamp}")
+                print(f"Merkle Root: {block.merkle_root}")
+                print("Transactions:")
+                for transaction in block.transactions:
+                    print(f"  - {transaction}")
+                print("")
+
+        elif choice == "2":
+            sender = input("Enter sender: ")
+            receiver = input("Enter receiver: ")
+            amount = input("Enter amount: ")
+            new_transaction = f"{sender} -> {receiver}: {amount}"
+            blockchain.get_latest_block().transactions.append(new_transaction)
+            print("Transaction added to the pending block.")
+
+        elif choice == "3":
+            new_block = Block(len(blockchain.chain), blockchain.get_latest_block().hash, int(time.time()), [])
+            new_block.mine_block(blockchain.difficulty)
+            blockchain.add_block(new_block)
+            print("Block mined and added to the blockchain.")
+
+        elif choice == "4":
+            is_valid = blockchain.is_chain_valid()
+            if is_valid:
+                print("The blockchain is valid.")
+            else:
+                print("The blockchain is NOT valid.")
+
+        elif choice == "5":
+            print("Exiting the Blockchain Console Interface.")
+            break
+
+if __name__ == "__main__":
+    main()
