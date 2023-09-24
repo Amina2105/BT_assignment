@@ -1,6 +1,7 @@
 import hashlib
 import time
 
+#Block class for individual blocks in the blockchain
 class Block:
     def __init__(self, index, previous_hash, timestamp, transactions):
         self.index = index
@@ -10,17 +11,20 @@ class Block:
         self.merkle_root = self.calculate_merkle_root()
         self.nonce = 0
         self.hash = self.calculate_hash()
-
+        
+    #Calculate the hash of the block
     def calculate_hash(self):
         data = str(self.index) + str(self.previous_hash) + str(self.timestamp) + str(self.merkle_root) + str(self.nonce)
         return hashlib.sha256(data.encode()).hexdigest()
 
+    #Proof-of-work (mining) to find a hash
     def mine_block(self, difficulty):
         while self.hash[:difficulty] != '0' * difficulty:
             self.nonce += 1
             self.hash = self.calculate_hash()
         print(f"Block mined: {self.hash}")
 
+    #Calculate the Merkle root of transactions in the block
     def calculate_merkle_root(self):
         if len(self.transactions) == 0:
             return "0"
@@ -37,6 +41,7 @@ class Block:
             merkle_tree = new_merkle_tree
         return merkle_tree[0]
 
+#Define a Blockchain class to manage a chain of blocks
 class Blockchain:
     def __init__(self):
         self.chain = [self.create_genesis_block()]
