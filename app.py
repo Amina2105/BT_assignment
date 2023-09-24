@@ -47,17 +47,21 @@ class Blockchain:
         self.chain = [self.create_genesis_block()]
         self.difficulty = 2
 
+    # Create and return a genesis block with index 0
     def create_genesis_block(self):
         return Block(0, "0", int(time.time()), [])
 
+    # Get the latest block in the blockchain
     def get_latest_block(self):
         return self.chain[-1]
 
+    # Add a new block to the blockchain after mining
     def add_block(self, new_block):
         new_block.previous_hash = self.get_latest_block().hash
         new_block.mine_block(self.difficulty)
         self.chain.append(new_block)
 
+    # Check the validity of the blockchain by verifying hashes and previous block hashes
     def is_chain_valid(self):
         for i in range(1, len(self.chain)):
             current_block = self.chain[i]
@@ -69,6 +73,7 @@ class Blockchain:
                 return False
         return True
 
+# Define the main function to create a blockchain and interact with it via a console interface
 def main():
     blockchain = Blockchain()
 
